@@ -247,7 +247,7 @@ GET /configs/epp_data/config?version=<上次版本号>
 | maxRequests / maxBytes | 否 | 全局并发上限（跨全部优先级带）；Kubernetes Quantity 格式（`"100"`、`"1k"`、`"1Gi"`），缺省或 "0" 表示不限。**用户侧 `flow_control.max_requests` 编译为 maxRequests** |
 | defaultRequestTTL | 否 | 池**有端点**时的排队预算，默认 60s；超期以可重试背压错误拒绝。显式 "0s" 禁用驱逐（等客户端断开）。用户侧 `queue_ttl` 编译而来 |
 | noEndpointRequestTTL | 否 | 池**无端点**（冷启动扩容）时的排队预算，默认跟随 defaultRequestTTL； regime 切换时重新起算（语义细节见《EPP代码分析/05-流控系统》§4）。用户侧 `no_endpoint_queue_ttl` 编译而来 |
-| priorityBands | 否 | 显式优先级带；未声明的优先级回落 defaultPriorityBand 模板。用户侧不配置，用系统默认 |
+| priorityBands | 否 | 显式优先级带；未声明的优先级回落 defaultPriorityBand 模板。ai-gateway-api 编译器显式下发 priority 0 band：`maxRequests` 联动全局 `flow_control.max_requests`（缺省/`-1` 不限时为 `"10000"`），`maxBytes` 默认 `"5Gi"`（fixes ai-gateway-api#198，避免落入 llm-d 隐藏默认 5000/1GB 截断全局配置） |
 | defaultPriorityBand / defaultNegativePriorityBand | 否 | 默认带模板；负优先级单独模板用于"可牺牲流量"（小容量，饱和时快速拒绝） |
 | usageLimitPolicyPluginRef | 否 | 容量自适应策略插件；缺省静态策略（threshold=1.0，不门控） |
 | saturationDetector.pluginRef | 否 | 饱和度检测插件，默认 `utilization-detector` |
